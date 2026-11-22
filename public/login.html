@@ -60,14 +60,6 @@
     <button class="btn" type="submit" id="submitBtn">Sign In as Student →</button>
     <div class="msg" id="msg" role="alert"></div>
    </form>
-
-   <div class="demo-box" id="demoBox">
-    <b>Demo Credentials (for quick testing):</b><br>
-    <span id="demoText">Student: <code>student@hypeup.edu</code> / <code>student123</code></span>
-    <div style="margin-top:8px">
-     <button type="button" class="btn xs ghost" id="fillDemo">Auto-fill Demo Credentials</button>
-    </div>
-   </div>
   </div>
  </main>
 </div>
@@ -76,10 +68,10 @@
 const $=id=>document.getElementById(id);
 let role="student", isSignup=false;
 
-const DEMOS={
- student:{email:"student@hypeup.edu",pass:"student123",label:"Student: student@hypeup.edu / student123",dest:"student.html"},
- faculty:{email:"faculty@hypeup.edu",pass:"faculty123",label:"Faculty: faculty@hypeup.edu / faculty123",dest:"faculty.html"},
- admin:{email:"admin@campus.edu",pass:"",label:"",dest:"admin.html"}
+const ROLE_CONFIG={
+ student:{placeholder:"student@campus.edu",dest:"student.html"},
+ faculty:{placeholder:"faculty@campus.edu",dest:"faculty.html"},
+ admin:{placeholder:"admin@campus.edu",dest:"admin.html"}
 };
 
 // Redirect if already logged in
@@ -87,7 +79,7 @@ const DEMOS={
  try{
   const tok=sessionStorage.getItem("hu_token");
   const u=JSON.parse(sessionStorage.getItem("hu_user")||"null");
-  if(tok&&u&&DEMOS[u.role])location.replace(DEMOS[u.role].dest);
+  if(tok&&u&&ROLE_CONFIG[u.role])location.replace(ROLE_CONFIG[u.role].dest);
  }catch(e){}
 })();
 
@@ -101,9 +93,7 @@ function renderUI(){
  $("formHeading").textContent=isSignup?"Create Student Account":`${titleRole} Sign In`;
  $("toggleSignup").textContent=isSignup?"Already have an account? Sign in":"New student? Sign up";
  $("submitBtn").textContent=isSignup?"Create Account & Continue →":`Sign In as ${titleRole} →`;
- $("email").placeholder=DEMOS[role].email;
- $("demoBox").hidden=role==="admin";
- $("demoText").textContent=DEMOS[role].label;
+ $("email").placeholder=ROLE_CONFIG[role].placeholder;
  $("msg").textContent="";
 }
 
@@ -111,11 +101,6 @@ document.querySelectorAll(".tab").forEach(t=>{
  t.onclick=()=>{role=t.dataset.role;renderUI()};
 });
 $("toggleSignup").onclick=()=>{isSignup=!isSignup;renderUI()};
-$("fillDemo").onclick=()=>{
- isSignup=false;renderUI();
- $("email").value=DEMOS[role].email;
- $("password").value=DEMOS[role].pass;
-};
 
 $("authForm").onsubmit=async e=>{
  e.preventDefault();
@@ -131,13 +116,13 @@ $("authForm").onsubmit=async e=>{
   if(!r.ok)throw new Error(d.error||"Authentication failed.");
   sessionStorage.setItem("hu_token",d.token);
   sessionStorage.setItem("hu_user",JSON.stringify(d.user));
-  location.href=DEMOS[d.user.role].dest;
+  location.href=ROLE_CONFIG[d.user.role].dest;
  }catch(err){m.textContent=err.message}
 };
 
 // Support ?role=faculty or ?role=admin query param
 const qp=new URLSearchParams(location.search).get("role");
-if(qp&&DEMOS[qp])role=qp;
+if(qp&&ROLE_CONFIG[qp])role=qp;
 renderUI();
 </script>
 </body>

@@ -652,7 +652,6 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`HypeUp running at http://localhost:${PORT}`);
-    console.log('Seeded accounts -> Admin: ksshowrya33@gmail.com | Faculty: faculty@hypeup.edu / faculty123 | Student: student@hypeup.edu / student123');
   });
 }
 
