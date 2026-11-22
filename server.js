@@ -211,22 +211,33 @@ function formatUser(u) {
   return { id: u.id, name: u.name, email: u.email, usn: u.usn, department: u.department, role: u.role, created_at: u.created_at };
 }
 
-/* ---------- Role-Based Sessions (in-memory tokens, 8 hours) ---------- */
-const sessions = new Map();
+/* ---------- Role-Based Stateless HMAC Sessions (8 hours, serverless-safe) ---------- */
+const TOKEN_SECRET = process.env.SESSION_SECRET || crypto.createHash('sha256').update(DB_PATH + '|hypeup-2026').digest('hex');
+
+function issueToken(user) {
+  const payload = Buffer.from(JSON.stringify({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    exp: Date.now() + 8 * 3600 * 1000
+  })).toString('base64url');
+  const sig = crypto.createHmac('sha256', TOKEN_SECRET).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
 
 function getSessionUser(req) {
   const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
-  if (!token) return null;
-  const s = sessions.get(token);
-  if (!s || s.exp < Date.now()) {
-    sessions.delete(token);
-    return null;
-  }
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(s.userId);
-  if (!user) {
-    sessions.delete(token);
-    return null;
-  }
+  const dot = token.indexOf('.');
+  if (dot <= 0) return null;
+  const payload = token.slice(0, dot);
+  const sig = token.slice(dot + 1);
+  const expected = crypto.createHmac('sha256', TOKEN_SECRET).update(payload).digest('base64url');
+  if (sig.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+  let data;
+  try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch { return null; }
+  if (!data || !data.id || !data.exp || data.exp < Date.now()) return null;
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(data.id);
+  if (!user) return null;
   return { user, token };
 }
 
@@ -266,8 +277,7 @@ app.post('/api/auth/register', (req, res) => {
 
   const userId = createUser({ name, email, usn, department, role: 'student', password });
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-  const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { userId: user.id, exp: Date.now() + 8 * 3600 * 1000 });
+  const token = issueToken(user);
 
   logAction(user, 'STUDENT_SIGNUP', `${name} (${usn})`, `Registered new student account in ${department}`);
   res.status(201).json({ token, user: formatUser(user) });
@@ -292,8 +302,7 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(403).json({ error: `This account is registered as "${user.role}", not "${requestedRole}". Please switch to the ${user.role} login tab.` });
   }
 
-  const token = crypto.randomBytes(24).toString('hex');
-  sessions.set(token, { userId: user.id, exp: Date.now() + 8 * 3600 * 1000 });
+  const token = issueToken(user);
   res.json({ token, user: formatUser(user) });
 });
 
@@ -304,8 +313,6 @@ app.get('/api/auth/me', (req, res) => {
 });
 
 app.post('/api/auth/logout', (req, res) => {
-  const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
-  if (token) sessions.delete(token);
   res.json({ ok: true });
 });
 
@@ -549,7 +556,7 @@ app.get('/api/admin/stats', requireRole('admin'), (req, res) => {
 });
 
 app.get('/api/admin/events', requireRole('admin'), (req, res) => {
-  const rows = db.prepare(EVENTS_SQL + ' ORDER BY CASE e.status WHEN "pending" THEN 0 WHEN "approved" THEN 1 ELSE 2 END, e.event_date').all();
+  const rows = db.prepare(EVENTS_SQL + " ORDER BY CASE e.status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, e.event_date").all();
   res.json(rows.map(r => ({ ...r, seats_left: Math.max(r.capacity - r.registered, 0) })));
 });
 
