@@ -141,6 +141,16 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
+// Health check (reports DB engine & connection status without exposing secrets)
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.ensureReady();
+    res.json({ ok: true, engine: db.IS_PG ? 'postgres' : 'sqlite' });
+  } catch (err) {
+    res.status(500).json({ ok: false, engine: db.IS_PG ? 'postgres' : 'sqlite', code: err.code, message: err.message });
+  }
+});
+
 // Ensure DB schema + seed data are ready before handling any /api request
 app.use('/api', wrap(async (req, res, next) => {
   await db.ensureReady();
