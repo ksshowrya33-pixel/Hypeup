@@ -1,0 +1,13 @@
+{
+  "name": "hypeup",
+  "version": "1.0.0",
+  "description": "HypeUp - College Event Management Platform (Express + SQLite)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "better-sqlite3": ">=11.5.0",
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4"
+  }
+}

@@ -1,0 +1,6 @@
+node_modules/
+hypeup.db
+hypeup.db-shm
+hypeup.db-wal
+public/uploads/
+.DS_Store

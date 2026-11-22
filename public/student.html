@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HypeUp – Student Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+ <div class="top">
+  <a class="logo" href="index.html" style="color:var(--accent)">HYPEUP.</a>
+  <div class="acts">
+   <span class="user-chip" id="userChip">Student</span>
+   <a class="btn sm ghost" href="index.html">Browse Events</a>
+   <button class="btn sm ghost" id="out">Log out</button>
+  </div>
+ </div>
+
+ <main style="padding-bottom:60px">
+  <div class="kicker">Student Dashboard</div>
+  <h2 style="font-size:2rem;margin:6px 0 18px" id="welcome">Welcome back</h2>
+
+  <div class="stats">
+   <div class="stat"><b id="s1">0</b><span>My Registrations</span></div>
+   <div class="stat"><b id="s2">0</b><span>Events Checked In</span></div>
+   <div class="stat"><b id="s3">0</b><span>Open Campus Events</span></div>
+  </div>
+
+  <div class="panel">
+   <h2>My QR Tickets &amp; Attendance</h2>
+   <p style="margin:0 0 14px;color:var(--muted)">Your registrations are saved in your student account. Show your QR code at the venue for check-in, or cancel before check-in to free up your seat.</p>
+   <div id="myTickets"></div>
+  </div>
+
+  <div class="panel">
+   <h2>Quick 1-Click Registration</h2>
+   <div class="grid" id="openEvents"></div>
+  </div>
+ </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let token="",user=null;
+
+try{
+ token=sessionStorage.getItem("hu_token")||"";
+ user=JSON.parse(sessionStorage.getItem("hu_user")||"null");
+}catch(e){}
+
+if(!token||!user||user.role!=="student"){
+ location.replace("login.html?role=student");
+}
+
+$("userChip").textContent=`🎓 ${user.name} · ${user.usn||user.department}`;
+$("welcome").textContent=`Welcome, ${user.name} (${user.usn||user.department})`;
+
+async function api(url,opts={}){
+ opts.headers=Object.assign({"Content-Type":"application/json"},opts.headers||{},{Authorization:"Bearer "+token});
+ const r=await fetch(url,opts);
+ if(r.status===401){logout();throw new Error("Session expired.")}
+ const d=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(d.error||"Something went wrong");
+ return d;
+}
+
+function logout(){
+ fetch("/api/auth/logout",{method:"POST",headers:{Authorization:"Bearer "+token}}).catch(()=>{});
+ sessionStorage.removeItem("hu_token");sessionStorage.removeItem("hu_user");
+ location.replace("login.html?role=student");
+}
+$("out").onclick=logout;
+
+async function loadAll(){
+ try{
+  const [tickets,events]=await Promise.all([api("/api/tickets"),api("/api/events")]);
+  $("s1").textContent=tickets.length;
+  $("s2").textContent=tickets.filter(t=>t.checked_in).length;
+  $("s3").textContent=events.length;
+
+  const tw=$("myTickets");tw.innerHTML="";
+  if(!tickets.length){
+   tw.innerHTML='<p style="color:var(--muted)">You haven’t registered for any events yet. Pick one below!</p>';
+  }else{
+   tickets.forEach(t=>{
+    const el=document.createElement("div");el.className="ticket";
+    el.innerHTML=`
+     <div class="info">
+      <small>${esc(t.category)} · Official Pass</small>
+      <h3>${esc(t.title)}</h3>
+      <small>${esc(t.event_date)} · ${esc(t.event_time||"")} · ${esc(t.venue)}</small>
+      <div class="tid">${esc(t.ticket_id)}</div>
+      <div class="acts" style="margin-top:8px">
+       <span class="badge ${t.checked_in?"in":""}">${t.checked_in?"Checked in":"Valid"}</span>
+       <button class="btn xs ghost" type="button" onclick="window.print()">Print</button>
+       ${t.checked_in?"":`<button class="btn xs danger" type="button" data-cancel="${esc(t.ticket_id)}">Cancel</button>`}
+      </div>
+     </div>
+     <div class="stub"><div class="qr"><img alt="QR code" src="${t.qr}"></div><small>Scan at entry</small></div>`;
+    const cb=el.querySelector("[data-cancel]");
+    if(cb)cb.onclick=()=>cancelTicket(t.ticket_id,t.title);
+    tw.appendChild(el);
+   });
+  }
+
+  const regIds=new Set(tickets.map(t=>t.event_id));
+  const ow=$("openEvents");ow.innerHTML="";
+  const avail=events.filter(e=>!regIds.has(e.id));
+  if(!avail.length){
+   ow.innerHTML='<p style="color:var(--muted)">You are registered for all upcoming events!</p>';
+  }else{
+   avail.forEach(e=>{
+    const c=document.createElement("article");c.className="card";
+    const full=e.seats_left<=0;
+    c.innerHTML=`
+     <span class="pill">${esc(e.category)}</span>
+     <h3>${esc(e.title)}</h3>
+     <p><b>Date:</b> ${esc(e.event_date)} (${esc(e.event_time||"")})</p>
+     <p><b>Venue:</b> ${esc(e.venue)}</p>
+     <p class="seats ${full||e.seats_left<=20?"low":""}">${full?"Sold out":e.seats_left+" seats left"}</p>
+     <p>${esc(e.description)}</p>`;
+    const b=document.createElement("button");b.className="btn sm";
+    if(full){b.textContent="Sold out";b.disabled=true}
+    else{b.textContent="1-Click Register →";b.onclick=()=>quickReg(e.id)}
+    c.appendChild(b);ow.appendChild(c);
+   });
+  }
+ }catch(err){console.error(err)}
+}
+
+async function quickReg(eventId){
+ try{
+  await api("/api/register",{method:"POST",body:JSON.stringify({event_id:eventId})});
+  loadAll();
+ }catch(err){alert(err.message)}
+}
+
+async function cancelTicket(ticketId,title){
+ if(!confirm(`Cancel your registration for "${title}"?`))return;
+ try{
+  await api("/api/tickets/"+encodeURIComponent(ticketId),{method:"DELETE"});
+  loadAll();
+ }catch(err){alert(err.message)}
+}
+
+loadAll();
+</script>
+</body>
+</html>

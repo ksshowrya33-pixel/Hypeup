@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HypeUp – Smart Campus Event & Engagement Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="hero" id="home">
+ <canvas id="heroTubes" aria-hidden="true"></canvas>
+ <div class="orb o1" aria-hidden="true"></div><div class="orb o2" aria-hidden="true"></div>
+ <div class="wrap" style="width:100%">
+  <header>
+   <a class="logo" href="#home">HYPEUP.</a>
+   <nav aria-label="Main" id="mainNav">
+    <a href="#home">Home</a>
+    <a href="#explore">Explore</a>
+    <a href="#register">Register</a>
+    <a href="#assistant">AI Assistant</a>
+    <a href="#architecture">How It Works</a>
+    <a class="nav-cta" href="login.html" id="portalLink">Portal Login →</a>
+   </nav>
+  </header>
+ </div>
+ <div class="wrap hero-body">
+  <div class="eyebrow">Your campus. Your community. Role-powered.</div>
+  <h1>Find Your People.<br>Feel The Hype.</h1>
+  <p>Discover approved campus events, register with your USN for instant QR passes, and track attendance seamlessly across Student, Faculty, and Admin portals.</p>
+  <div class="hero-actions">
+   <a class="btn" href="#explore">Explore Events →</a>
+   <a class="btn ghost-light" href="login.html">Student / Faculty / Admin Login</a>
+  </div>
+  <div class="hero-hint">Move cursor · Click background to shift 3D tubes</div>
+ </div>
+</div>
+
+<main>
+<section id="storyFlow" class="ticker-section" aria-label="Campus story ticker">
+ <div class="ticker-kicker">Scroll to read the campus pulse →</div>
+ <div class="ticker-track" id="tickerTrack">
+  <span class="ticker-text">On every campus,</span>
+  <span class="ticker-svg wide" aria-hidden="true">
+   <svg width="76" height="32" viewBox="0 0 76 32" fill="none"><path d="M2 22C18 4 34 4 44 18C54 30 66 26 74 10" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+  </span>
+  <span class="ticker-text">discover the undeniable</span>
+  <span class="ticker-em">Real Hype</span>
+  <span class="ticker-svg tight" aria-hidden="true">
+   <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M21 3L25.2 16.8L39 21L25.2 25.2L21 39L16.8 25.2L3 21L16.8 16.8L21 3Z" fill="currentColor"/></svg>
+  </span>
+  <span class="ticker-text">of sharing live</span>
+  <span class="ticker-pill">Moments</span>
+  <span class="ticker-svg wide" aria-hidden="true">
+   <svg width="52" height="38" viewBox="0 0 52 38" fill="none"><rect x="2" y="4" width="48" height="30" rx="6" stroke="currentColor" stroke-width="3"/><path d="M16 4V11M16 27V34M16 16V22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="25" y="13" width="12" height="12" rx="2" fill="currentColor"/></svg>
+  </span>
+  <span class="ticker-text">that bring students</span>
+  <span class="ticker-em">Together</span>
+  <span class="ticker-svg wide" aria-hidden="true">
+   <svg width="72" height="36" viewBox="0 0 72 36" fill="none"><path d="M4 26C18 8 36 8 48 22C56 31 64 24 68 12M68 12L58 14M68 12L66 22" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+ </div>
+</section>
+
+<section id="explore"><div class="wrap">
+ <div id="notices"></div>
+ <div class="kicker">What’s happening</div>
+ <h2>Upcoming Campus Events ✨</h2>
+
+ <div class="toolbar">
+  <div class="chips" id="chips" role="group" aria-label="Filter by category">
+   <button class="chip active" data-cat="All">All</button>
+   <button class="chip" data-cat="Technology">Technology</button>
+   <button class="chip" data-cat="Cultural">Cultural</button>
+   <button class="chip" data-cat="Sports">Sports</button>
+   <button class="chip" data-cat="Entertainment">Entertainment</button>
+   <button class="chip" data-cat="Workshop">Workshop</button>
+  </div>
+  <div class="search-box">
+   <input id="search" type="search" placeholder="Search events, venues..." aria-label="Search events">
+  </div>
+ </div>
+
+ <div class="grid stack-deck" id="grid"></div>
+</div></section>
+
+<section id="register"><div class="wrap">
+ <div class="kicker">Save your spot</div>
+ <h2>Join the Hype!</h2>
+ <div id="loggedNotice" class="notice" hidden>
+  <div><b id="loggedName"></b><br><span id="loggedMeta"></span></div>
+  <a class="btn sm ghost" id="dashLink" href="student.html">Open My Dashboard →</a>
+ </div>
+ <form class="form" id="rForm" novalidate>
+  <label for="ev">Choose an event</label>
+  <select id="ev"><option value="">Select an event</option></select>
+  <label for="nm">Your full name</label>
+  <input id="nm" placeholder="Enter your name" autocomplete="name">
+  <div class="form-row">
+   <div>
+    <label for="usn">USN / Roll No.</label>
+    <input id="usn" placeholder="e.g., ENG25CS0042" style="text-transform:uppercase">
+   </div>
+   <div>
+    <label for="dept">Department</label>
+    <select id="dept">
+     <option>CSE</option><option>ISE</option><option>ECE</option><option>AI &amp; ML</option><option>Data Science</option><option>Mechanical</option><option>Civil</option>
+    </select>
+   </div>
+  </div>
+  <label for="em">Email address</label>
+  <input id="em" type="email" placeholder="Enter your email" autocomplete="email">
+  <button class="btn" type="submit">Register &amp; Get QR Ticket →</button>
+  <div class="msg" id="msg" role="status"></div>
+ </form>
+
+ <form class="lookup" id="lForm" novalidate>
+  <input id="le" type="email" placeholder="Already registered? Enter email to view QR tickets" aria-label="Email to find your tickets" autocomplete="email">
+  <button class="btn sm" type="submit">Find my tickets</button>
+ </form>
+ <div class="msg" id="lmsg" role="status"></div>
+ <div id="tickets"></div>
+</div></section>
+
+<section id="assistant"><div class="wrap">
+ <div class="kicker">Your event buddy</div>
+ <h2>Meet Your HypeUp Assistant 🤖</h2>
+ <p style="margin:0;color:var(--muted)">Ask about upcoming events, categories, available seats, venues, or how to get your QR pass.</p>
+ <div class="quick-prompts">
+  <button type="button" class="chip" data-q="What's next?">What's next?</button>
+  <button type="button" class="chip" data-q="Show technology events">Technology events</button>
+  <button type="button" class="chip" data-q="How many seats are left?">Seats left</button>
+  <button type="button" class="chip" data-q="How do QR tickets work?">QR tickets</button>
+  <button type="button" class="chip" data-q="Where is student data saved?">Where is data saved?</button>
+ </div>
+ <div class="chat" id="chat" aria-live="polite"></div>
+ <form class="ask" id="aForm"><input id="aq" placeholder="Ask me about college events..." aria-label="Ask about college events" autocomplete="off"><button class="btn" type="submit">Ask →</button></form>
+</div></section>
+
+<section id="architecture" style="background:var(--bg2)"><div class="wrap">
+ <div class="kicker">System Transparency</div>
+ <h2>How Data &amp; Updates Work</h2>
+ <div class="arch-grid">
+  <div class="arch-card">
+   <h3>1. Where Student Data Is Saved</h3>
+   <p>All student profiles, event details, registrations, QR ticket IDs, and attendance logs are persisted in a relational <b>SQLite database (<code>hypeup.db</code>)</b> with foreign-key integrity and WAL mode.</p>
+  </div>
+  <div class="arch-card">
+   <h3>2. Who Updates Events</h3>
+   <p><b>Faculty Coordinators</b> propose and manage department events. <b>Admins</b> review, approve/reject, and publish events. Every change is recorded in an <b>Audit Log</b>.</p>
+  </div>
+  <div class="arch-card">
+   <h3>3. 3-Role Access Control</h3>
+   <p>Separate authenticated portals for <a href="login.html?role=student" style="color:var(--accent)">Students</a>, <a href="login.html?role=faculty" style="color:var(--accent)">Faculty</a>, and <a href="login.html?role=admin" style="color:var(--accent)">Admins</a> using scrypt password hashing and role-verified tokens.</p>
+  </div>
+ </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><b>HYPEUP.</b>Your Campus. Your Vibe. Your Events.<br>© 2026 HypeUp. Dayananda Sagar University – Dept. of CSE.<br><a href="login.html?role=student" style="color:var(--muted)">Student Login</a> · <a href="login.html?role=faculty" style="color:var(--muted)">Faculty Login</a> · <a href="login.html?role=admin" style="color:var(--muted)">Admin Login</a></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let EV=[],activeCat="All",searchQ="",lastId=null,currentUser=null,authToken="";
+
+async function api(url,opts={}){
+ if(authToken)opts.headers=Object.assign({},opts.headers||{},{Authorization:"Bearer "+authToken});
+ const r=await fetch(url,opts);
+ const d=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(d.error||"Something went wrong");
+ return d;
+}
+
+(function initSession(){
+ try{
+  authToken=sessionStorage.getItem("hu_token")||"";
+  currentUser=JSON.parse(sessionStorage.getItem("hu_user")||"null");
+  if(authToken&&currentUser){
+   const dest=currentUser.role==="admin"?"admin.html":currentUser.role==="faculty"?"faculty.html":"student.html";
+   $("portalLink").textContent=`${currentUser.name} (${currentUser.role}) →`;
+   $("portalLink").href=dest;
+   $("loggedNotice").hidden=false;
+   $("loggedName").textContent=`Signed in as ${currentUser.name} (${currentUser.role.toUpperCase()})`;
+   $("loggedMeta").textContent=`${currentUser.usn||""} · ${currentUser.department||""} · ${currentUser.email}`;
+   $("dashLink").href=dest;
+   $("nm").value=currentUser.name;$("nm").readOnly=true;
+   $("em").value=currentUser.email;$("em").readOnly=true;
+   $("usn").value=currentUser.usn||"";if(currentUser.usn)$("usn").readOnly=true;
+   if(currentUser.department)$("dept").value=currentUser.department;
+   showTickets(currentUser.email).catch(()=>{});
+  }
+ }catch(e){}
+})();
+
+async function loadNotices(){
+ try{
+  const list=await api("/api/announcements");
+  if(!list.length)return;
+  const n=list[0];
+  $("notices").innerHTML=`<div class="notice"><div><b>📢 ${esc(n.title)}</b><br><span>${esc(n.message)} — <i>${esc(n.created_by_name)} (${esc(n.created_by_role)})</i></span></div></div>`;
+ }catch(e){}
+}
+
+async function loadEvents(){
+ try{EV=await api("/api/events")}
+ catch(e){$("grid").innerHTML='<p style="color:var(--bad)">Could not load events. Is the server running?</p>';return}
+ renderGrid();renderSelect();
+}
+
+function eventImage(e){
+ if(e.image_url)return e.image_url;
+ const t=(e.title||"").toLowerCase();
+ if(/robot|workshop|cloud|devops|bootcamp/.test(t))return "images/workshop.jpg";
+ if(/tech|hack|code|ai/.test(t))return "images/tech-fest.jpg";
+ if(/cascades|dj|concert|entertainment/.test(t))return "images/cascades-fest.jpg";
+ if(/cultur|music|dance/.test(t))return "images/cultural-night.jpg";
+ if(/sport|athlet|cricket|football/.test(t))return "images/sports-day.jpg";
+ const map={Technology:"images/tech-fest.jpg",Cultural:"images/cultural-night.jpg",Sports:"images/sports-day.jpg",Entertainment:"images/cascades-fest.jpg",Workshop:"images/workshop.jpg"};
+ return map[e.category]||"images/tech-fest.jpg";
+}
+
+function renderGrid(){
+ const g=$("grid");g.innerHTML="";
+ const filtered=EV.filter(e=>{
+  const matchCat=activeCat==="All"||e.category===activeCat;
+  const q=searchQ.toLowerCase();
+  const matchQ=!q||e.title.toLowerCase().includes(q)||e.venue.toLowerCase().includes(q)||e.description.toLowerCase().includes(q);
+  return matchCat&&matchQ;
+ });
+ if(!filtered.length){g.innerHTML='<p style="color:var(--muted)">No matching events found.</p>';return}
+ filtered.forEach((e,idx)=>{
+  const c=document.createElement("article");c.className="card";
+  c.style.setProperty("--i",idx);
+  const pct=Math.min(100,Math.round((e.registered/e.capacity)*100));
+  const full=e.seats_left<=0;
+  c.innerHTML=`
+   <img class="card-media" src="${eventImage(e)}" alt="${esc(e.title)}" loading="lazy">
+   <div class="card-body">
+    <div class="card-top">
+     <span class="pill">${esc(e.category)}</span>
+     <small style="color:var(--muted)">${esc(e.event_time||"")}</small>
+    </div>
+    <h3>${esc(e.title)}</h3>
+    <p><b>Date:</b> ${esc(e.event_date)} · <b>Venue:</b> ${esc(e.venue)}</p>
+    <p><b>Coordinator:</b> ${esc(e.creator_name||"Campus Team")}</p>
+    <div class="progress" aria-label="Seat occupancy"><i style="width:${pct}%"></i></div>
+    <p class="seats ${full||e.seats_left<=20?"low":""}">${full?"Sold out":e.seats_left+" of "+e.capacity+" seats left"}</p>
+    <p>${esc(e.description)}</p>
+   </div>`;
+  const b=document.createElement("button");b.className="btn sm";
+  if(full){b.textContent="Sold out";b.disabled=true}
+  else{
+   b.textContent="Register →";
+   b.onclick=()=>{$("ev").value=e.id;location.hash="register";setTimeout(()=>{if(!$("nm").readOnly)$("nm").focus({preventScroll:true})},350)};
+  }
+  c.querySelector(".card-body").appendChild(b);g.appendChild(c);
+ });
+ if(typeof setupStackCards==="function")setupStackCards();
+}
+
+function renderSelect(){
+ const cur=$("ev").value;
+ $("ev").innerHTML='<option value="">Select an event</option>'+EV.filter(e=>e.seats_left>0).map(e=>`<option value="${e.id}">${esc(e.title)} (${esc(e.event_date)})</option>`).join("");
+ $("ev").value=cur;
+}
+
+document.querySelectorAll("#chips .chip").forEach(ch=>{
+ ch.onclick=()=>{
+  activeCat=ch.dataset.cat;
+  document.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("active",x===ch));
+  renderGrid();
+ };
+});
+$("search").oninput=e=>{searchQ=e.target.value.trim();renderGrid()};
+
+function ticketEl(t){
+ const el=document.createElement("div");el.className="ticket";
+ el.innerHTML=`
+  <div class="info">
+   <small>Official Campus Pass</small>
+   <h3>${esc(t.title)}</h3>
+   <small>${esc(t.event_date)} · ${esc(t.event_time||"")} · ${esc(t.venue)}</small>
+   <small>${esc(t.name)} ${t.usn?"("+esc(t.usn)+")":""} · ${esc(t.department||"")}</small>
+   <div class="tid">${esc(t.ticket_id)}</div>
+   <span class="badge ${t.checked_in?"in":""}">${t.checked_in?"Checked in":"Valid"}</span>
+  </div>
+  <div class="stub"><div class="qr"><img alt="QR code for ticket" src="${t.qr}"></div><small>Scan at entry</small></div>`;
+ return el;
+}
+
+async function showTickets(email){
+ const list=await api("/api/tickets?email="+encodeURIComponent(email)),w=$("tickets");
+ w.innerHTML="";
+ list.forEach(t=>{const el=ticketEl(t);if(t.ticket_id===lastId)el.classList.add("new");w.appendChild(el)});
+ return list.length;
+}
+
+$("rForm").onsubmit=async x=>{
+ x.preventDefault();
+ const m=$("msg"),id=$("ev").value,name=$("nm").value.trim(),email=$("em").value.trim(),usn=$("usn").value.trim(),department=$("dept").value;
+ m.className="msg bad";
+ if(!id){m.textContent="Choose an event first.";return}
+ if(!name){m.textContent="Enter your name.";return}
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){m.textContent="Enter a valid email address.";return}
+ try{
+  const t=await api("/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({event_id:id,name,email,usn,department})});
+  lastId=t.ticket_id;
+  await showTickets(email);
+  m.className="msg ok";m.textContent="You’re in! Your QR ticket is below and saved in the database.";
+  confetti();
+  if(!currentUser){$("nm").value="";$("em").value="";$("usn").value=""}
+  $("ev").value="";
+  loadEvents();
+  setTimeout(()=>$("tickets").scrollIntoView({behavior:"smooth",block:"nearest"}),150);
+ }catch(err){m.textContent=err.message}
+};
+
+$("lForm").onsubmit=async x=>{
+ x.preventDefault();
+ const m=$("lmsg");m.className="msg bad";m.textContent="";
+ try{const n=await showTickets($("le").value.trim());if(!n)m.textContent="No tickets found for this email."}
+ catch(err){m.textContent=err.message}
+};
+
+function say(t,who){const d=document.createElement("div");d.className="b "+who;d.textContent=t;$("chat").appendChild(d);$("chat").scrollTop=1e5}
+const det=e=>`${e.title} (${e.category})\nDate: ${e.event_date} at ${e.event_time||"TBD"}\nVenue: ${e.venue}\nCoordinator: ${e.creator_name||"Campus Team"}\nSeats left: ${e.seats_left}/${e.capacity}\n${e.description}`;
+function answer(q){
+ q=q.toLowerCase();
+ if(/where.*data|saved|database|storage|sqlite/.test(q))return "All student profiles, registrations, QR tickets, and events are saved persistently in our relational SQLite database (hypeup.db) with 5 normalized tables: users, events, registrations, announcements, and audit_logs.";
+ if(/who.*updat|faculty|admin|role|login/.test(q))return "HypeUp uses 3-role access control:\n• Faculty Coordinators propose & manage department events.\n• Admins review, approve, and audit all platform events.\n• Students log in with their USN to register and view QR passes.";
+ if(!EV.length)return "I couldn’t load the events right now. Please refresh the page.";
+ const byTitle=EV.find(e=>q.includes(e.title.toLowerCase().split(" ")[0]));
+ if(byTitle)return det(byTitle);
+ const cats=[["Technology",/tech|cod(e|ing)|robot|ai/],["Cultural",/cultur|music|dance/],["Sports",/sport|game|competition/],["Entertainment",/entertain|dj|fest|ramp/],["Workshop",/workshop|bootcamp|seminar/]];
+ for(const [c,re] of cats)if(re.test(q)){const l=EV.filter(e=>e.category===c);return l.length?l.map(det).join("\n\n"):"There are no "+c.toLowerCase()+" events right now."}
+ if(/next|soon|upcoming|first|nearest/.test(q)){const t=new Date().toISOString().slice(0,10),up=EV.filter(e=>e.event_date>=t);return up.length?"The next event is:\n"+det(up[0]):"There are no upcoming events right now."}
+ if(/seat|space|full|left|capacity/.test(q))return EV.map(e=>`${e.title}: ${e.seats_left} seats left`).join("\n");
+ if(/where|venue|location/.test(q))return EV.map(e=>`${e.title}: ${e.venue}`).join("\n");
+ if(/when|date|day|time/.test(q))return EV.map(e=>`${e.title}: ${e.event_date} (${e.event_time||""})`).join("\n");
+ if(/qr|ticket/.test(q))return "After you register, HypeUp creates a unique ticket ID (HU-XXXXXX) and QR code. Show it at the venue so Faculty or Admin can scan it for attendance check-in.";
+ return "I can tell you about upcoming events, seats left, venues, QR tickets, or how data & roles work. Try clicking one of the chips above!";
+}
+function typing(){const d=document.createElement("div");d.className="b bot typing";d.innerHTML="<i></i><i></i><i></i>";$("chat").appendChild(d);$("chat").scrollTop=1e5;return d}
+function askBot(q){say(q,"me");const t=typing();setTimeout(()=>{t.remove();say(answer(q),"bot")},500)}
+$("aForm").onsubmit=e=>{e.preventDefault();const q=$("aq").value.trim();if(!q)return;$("aq").value="";askBot(q)};
+document.querySelectorAll(".quick-prompts .chip").forEach(b=>{b.onclick=()=>askBot(b.dataset.q)});
+function confetti(){
+ if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ const cols=["#b46cff","#5b7cff","#5be0b3","#ffd166","#ff8aa1"],box=document.createElement("div");box.className="confetti";box.setAttribute("aria-hidden","true");
+ for(let i=0;i<36;i++){const s=document.createElement("span");s.style.cssText="left:"+(Math.random()*100)+"%;background:"+cols[i%5]+";animation-delay:"+(Math.random()*.4)+"s;animation-duration:"+(1.6+Math.random()*1.2)+"s;--dx:"+(Math.random()*160-80)+"px";box.appendChild(s)}
+ document.body.appendChild(box);setTimeout(()=>box.remove(),3400);
+}
+say("Hi! Ask me about events, seats left, QR tickets, or where student data is saved.","bot");
+loadNotices();
+loadEvents();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function initTickerScroll(){
+ if(typeof gsap==="undefined"||typeof ScrollTrigger==="undefined")return;
+ if(matchMedia("(prefers-reduced-motion:reduce)").matches){
+  const sec=document.getElementById("storyFlow");if(sec)sec.style.overflowX="auto";return;
+ }
+ gsap.registerPlugin(ScrollTrigger);
+ const track=document.getElementById("tickerTrack");
+ const section=document.getElementById("storyFlow");
+ if(!track||!section)return;
+ const getDist=()=>Math.max(0,track.scrollWidth-window.innerWidth+64);
+ gsap.to(track,{
+  x:()=>-getDist(),
+  ease:"none",
+  scrollTrigger:{
+   trigger:section,
+   start:"top 22%",
+   end:()=>"+="+Math.max(500,getDist()),
+   pin:true,
+   scrub:1,
+   invalidateOnRefresh:true
+  }
+ });
+})();
+
+let stackTriggers=[];
+function setupStackCards(){
+ if(typeof gsap==="undefined"||typeof ScrollTrigger==="undefined")return;
+ if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ stackTriggers.forEach(t=>t.kill());
+ stackTriggers=[];
+ const cards=Array.from(document.querySelectorAll("#grid .card"));
+ cards.forEach((card,idx)=>{
+  if(idx===cards.length-1)return;
+  const next=cards[idx+1];
+  const anim=gsap.to(card,{
+   scale:0.95,
+   ease:"none",
+   scrollTrigger:{
+    trigger:next,
+    start:"top 75%",
+    end:"top 22%",
+    scrub:true,
+    invalidateOnRefresh:true
+   }
+  });
+  if(anim.scrollTrigger)stackTriggers.push(anim.scrollTrigger);
+ });
+ ScrollTrigger.refresh();
+}
+</script>
+<script type="module">
+(async function initHeroTubes(){
+ if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ const canvas=document.getElementById("heroTubes");
+ const hero=document.getElementById("home");
+ if(!canvas||!hero)return;
+ try{
+  const mod=await import("https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js");
+  const TubesCursor=mod.default;
+  const app=TubesCursor(canvas,{
+   tubes:{
+    colors:["#7091E6","#ADBBDA","#3D52A0"],
+    lights:{intensity:200,colors:["#EDE8F5","#7091E6","#8697C4","#3D52A0"]}
+   }
+  });
+  const randColors=n=>Array.from({length:n},()=>"#"+Math.floor(Math.random()*16777215).toString(16).padStart(6,"0"));
+  hero.addEventListener("click",e=>{
+   if(e.target.closest("a,button"))return;
+   if(app?.tubes?.setColors&&app?.tubes?.setLightsColors){
+    app.tubes.setColors(randColors(3));
+    app.tubes.setLightsColors(randColors(4));
+   }
+  });
+ }catch(err){console.warn("3D Tubes background fallback:",err)}
+})();
+</script>
+</body>
+</html>

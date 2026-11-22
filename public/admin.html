@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HypeUp – Admin Control Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+ <div class="top">
+  <a class="logo" href="index.html" style="color:var(--accent)">HYPEUP.</a>
+  <div class="acts">
+   <span class="user-chip" id="userChip">Admin</span>
+   <a class="btn sm ghost" href="index.html">Public Site</a>
+   <button class="btn sm ghost" id="out">Log out</button>
+  </div>
+ </div>
+
+ <main style="padding-bottom:60px">
+  <div class="kicker">Admin Control Center</div>
+  <h2 style="font-size:2rem;margin:6px 0 18px">Platform Overview &amp; Governance</h2>
+
+  <div class="stats">
+   <div class="stat"><b id="s1">0</b><span>Total Events</span></div>
+   <div class="stat"><b id="s2">0</b><span>Pending Approval</span></div>
+   <div class="stat"><b id="s3">0</b><span>Registrations</span></div>
+   <div class="stat"><b id="s4">0</b><span>Checked In</span></div>
+   <div class="stat"><b id="s5">0</b><span>Students</span></div>
+   <div class="stat"><b id="s6">0</b><span>Faculty</span></div>
+  </div>
+
+  <div class="two">
+   <div class="panel">
+    <h2 id="ft">Create &amp; Publish Event</h2>
+    <form id="ef" novalidate>
+     <label for="t">Title</label><input id="t" maxlength="80">
+     <div class="form-row">
+      <div>
+       <label for="c">Category</label>
+       <select id="c"><option>Technology</option><option>Cultural</option><option>Sports</option><option>Entertainment</option><option>Workshop</option></select>
+      </div>
+      <div>
+       <label for="cp">Capacity (seats)</label><input id="cp" type="number" min="1" value="100">
+      </div>
+     </div>
+     <div class="form-row">
+      <div><label for="d">Date</label><input id="d" type="date"></div>
+      <div><label for="tm">Time</label><input id="tm" value="10:00 AM"></div>
+     </div>
+     <label for="v">Venue</label><input id="v" maxlength="80">
+     <label for="ds">Description</label><textarea id="ds" maxlength="400"></textarea>
+     <label for="imgFile">Event Photo (optional — defaults to Ghibli category art)</label>
+     <input id="imgFile" type="file" accept="image/png,image/jpeg,image/webp">
+     <img id="imgPreview" alt="Event photo preview" hidden style="width:100%;max-height:150px;object-fit:cover;border-radius:12px;margin-top:10px;border:1px solid var(--line)">
+     <div class="acts" style="margin-top:16px">
+      <button class="btn sm" type="submit" id="sv">Publish Event</button>
+      <button class="btn sm ghost" type="button" id="cn" hidden>Cancel edit</button>
+     </div>
+     <div class="msg" id="em" role="status"></div>
+    </form>
+   </div>
+
+   <div style="display:flex;flex-direction:column;gap:24px">
+    <div class="panel" style="margin-bottom:0">
+     <h2>QR Attendance Check-In</h2>
+     <p style="margin:0 0 10px;color:var(--muted)">Scan a student’s QR ticket or type the ticket ID.</p>
+     <form class="acts" id="cf" novalidate style="flex-wrap:nowrap">
+      <input id="tid" placeholder="HU-XXXXXX" aria-label="Ticket ID" autocomplete="off" style="text-transform:uppercase">
+      <button class="btn sm" type="submit">Check in</button>
+     </form>
+     <div class="acts" style="margin-top:12px">
+      <button class="btn sm ghost" id="scan" type="button">Scan with camera</button>
+      <button class="btn sm ghost" id="stop" type="button" hidden>Stop camera</button>
+     </div>
+     <video id="cam" playsinline muted hidden></video><canvas id="cv" hidden></canvas>
+     <div class="msg" id="cm" role="status"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:0">
+     <h2>Database &amp; Storage Monitor</h2>
+     <p style="margin:0 0 10px;color:var(--muted);font-size:.9rem">Live inspection of where student &amp; event data is persisted.</p>
+     <div id="storageInfo" style="font-size:.9rem;color:var(--muted)">Loading...</div>
+    </div>
+   </div>
+  </div>
+
+  <div class="panel">
+   <h2>All Events &amp; Approval Queue</h2>
+   <div class="tbl">
+    <table>
+     <thead><tr><th>Event</th><th>Coordinator</th><th>Date &amp; Venue</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+     <tbody id="rows"></tbody>
+    </table>
+   </div>
+  </div>
+
+  <div class="panel" id="regp" hidden>
+   <h2 id="rt">Registrations</h2>
+   <div class="tbl">
+    <table>
+     <thead><tr><th>Ticket ID</th><th>Name</th><th>USN</th><th>Dept</th><th>Email</th><th>Status</th></tr></thead>
+     <tbody id="rrows"></tbody>
+    </table>
+   </div>
+  </div>
+
+  <div class="two">
+   <div class="panel">
+    <h2>User Accounts &amp; Roles</h2>
+    <form id="uf" novalidate style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)">
+     <div class="form-row">
+      <div><label for="un">Name</label><input id="un" placeholder="Prof. Name"></div>
+      <div><label for="uu">ID / USN</label><input id="uu" placeholder="FAC102" style="text-transform:uppercase"></div>
+     </div>
+     <div class="form-row">
+      <div><label for="ue">Email</label><input id="ue" type="email" placeholder="prof@hypeup.edu"></div>
+      <div><label for="ud">Department</label><input id="ud" value="CSE"></div>
+     </div>
+     <div class="form-row">
+      <div>
+       <label for="ur">Role</label>
+       <select id="ur"><option value="faculty">Faculty</option><option value="admin">Admin</option><option value="student">Student</option></select>
+      </div>
+      <div><label for="up">Password</label><input id="up" type="password" placeholder="Min 6 chars"></div>
+     </div>
+     <button class="btn sm" type="submit" style="margin-top:14px">Add User Account</button>
+     <div class="msg" id="um" role="status"></div>
+    </form>
+    <div class="tbl" style="max-height:280px;overflow-y:auto">
+     <table><thead><tr><th>Name</th><th>Role</th><th>ID / Dept</th><th>Tickets</th></tr></thead><tbody id="urows"></tbody></table>
+    </div>
+   </div>
+
+   <div class="panel">
+    <h2>Live Audit Trail (Who Updated What)</h2>
+    <div class="tbl" style="max-height:420px;overflow-y:auto">
+     <table><thead><tr><th>Actor</th><th>Action</th><th>Target &amp; Details</th><th>Time</th></tr></thead><tbody id="arows"></tbody></table>
+    </div>
+   </div>
+  </div>
+ </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let token="",user=null,EV=[],editId=null,stream=null,scanning=false;
+
+try{
+ token=sessionStorage.getItem("hu_token")||"";
+ user=JSON.parse(sessionStorage.getItem("hu_user")||"null");
+}catch(e){}
+
+if(!token||!user||user.role!=="admin"){
+ location.replace("login.html?role=admin");
+}
+
+$("userChip").textContent=`🛡️ ${user.name} · Admin`;
+
+async function api(url,opts={}){
+ opts.headers=Object.assign({"Content-Type":"application/json"},opts.headers||{},{Authorization:"Bearer "+token});
+ const r=await fetch(url,opts);
+ if(r.status===401){logout();throw new Error("Session expired.")}
+ const ct=r.headers.get("content-type")||"";
+ const d=ct.includes("json")?await r.json().catch(()=>({})):await r.text();
+ if(!r.ok)throw new Error(d.error||"Something went wrong");
+ return d;
+}
+
+function logout(){
+ stopScan();
+ fetch("/api/auth/logout",{method:"POST",headers:{Authorization:"Bearer "+token}}).catch(()=>{});
+ sessionStorage.removeItem("hu_token");sessionStorage.removeItem("hu_user");
+ location.replace("login.html?role=admin");
+}
+$("out").onclick=logout;
+
+async function refresh(){
+ try{
+  const [s,ev,users,audit,storage]=await Promise.all([
+   api("/api/admin/stats"),
+   api("/api/admin/events"),
+   api("/api/admin/users"),
+   api("/api/admin/audit"),
+   api("/api/admin/storage")
+  ]);
+  $("s1").textContent=s.events;$("s2").textContent=s.pending_events;$("s3").textContent=s.registrations;
+  $("s4").textContent=s.checked_in;$("s5").textContent=s.students;$("s6").textContent=s.faculty;
+  EV=ev;renderRows();renderUsers(users);renderAudit(audit);renderStorage(storage);
+ }catch(err){console.error(err)}
+}
+
+function renderStorage(st){
+ $("storageInfo").innerHTML=`
+  <div><b>Engine:</b> ${esc(st.engine)}</div>
+  <div style="word-break:break-all;margin:4px 0"><b>File:</b> <code>${esc(st.file_path)}</code> (${st.size_kb} KB)</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+   ${st.tables.map(t=>`<span class="pill">${esc(t.table)}: ${t.rows} rows</span>`).join("")}
+  </div>`;
+}
+
+function renderRows(){
+ const b=$("rows");b.innerHTML="";
+ if(!EV.length){b.innerHTML='<tr><td colspan="6">No events yet.</td></tr>';return}
+ EV.forEach(e=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+   <td><b>${esc(e.title)}</b><br><small>${esc(e.category)}</small></td>
+   <td>${esc(e.creator_name||"Admin")}<br><small>${esc(e.creator_role||"admin")}</small></td>
+   <td>${esc(e.event_date)} ${esc(e.event_time||"")}<br><small>${esc(e.venue)}</small></td>
+   <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
+   <td>${e.registered} / ${e.capacity}</td>
+   <td><div class="acts"></div></td>`;
+  const a=tr.querySelector(".acts");
+  if(e.status==="pending"){
+   const ap=document.createElement("button");ap.className="btn xs ok";ap.textContent="Approve";ap.onclick=()=>setStatus(e.id,"approved");a.appendChild(ap);
+   const rj=document.createElement("button");rj.className="btn xs danger";rj.textContent="Reject";rj.onclick=()=>setStatus(e.id,"rejected");a.appendChild(rj);
+  }
+  [["View",()=>viewRegs(e)],["Edit",()=>startEdit(e)],["CSV",()=>exportCsv(e)],["Delete",()=>del(e),"danger"]].forEach(([n,fn,cls])=>{
+   const x=document.createElement("button");x.className="btn xs "+(cls||"ghost");x.textContent=n;x.onclick=fn;a.appendChild(x);
+  });
+  b.appendChild(tr);
+ });
+}
+
+function renderUsers(list){
+ const b=$("urows");b.innerHTML="";
+ list.forEach(u=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><b>${esc(u.name)}</b><br><small>${esc(u.email)}</small></td><td><span class="pill">${esc(u.role)}</span></td><td>${esc(u.usn||"-")} · ${esc(u.department)}</td><td>${u.registrations_count}</td>`;
+  b.appendChild(tr);
+ });
+}
+
+function renderAudit(list){
+ const b=$("arows");b.innerHTML="";
+ list.forEach(l=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><b>${esc(l.actor_name)}</b><br><small>${esc(l.actor_role)}</small></td><td><span class="pill">${esc(l.action)}</span></td><td><b>${esc(l.target)}</b><br><small>${esc(l.details)}</small></td><td><small>${esc(l.created_at)}</small></td>`;
+  b.appendChild(tr);
+ });
+}
+
+async function setStatus(id,status){
+ try{await api(`/api/admin/events/${id}/status`,{method:"PATCH",body:JSON.stringify({status})});refresh()}
+ catch(err){alert(err.message)}
+}
+
+function startEdit(e){
+ editId=e.id;$("ft").textContent="Edit event";$("t").value=e.title;$("c").value=e.category;$("d").value=e.event_date;
+ $("tm").value=e.event_time||"10:00 AM";$("v").value=e.venue;$("cp").value=e.capacity;$("ds").value=e.description;
+ imageData="";$("imgFile").value="";
+ if(e.image_url){$("imgPreview").src=e.image_url;$("imgPreview").hidden=false}else{$("imgPreview").hidden=true}
+ $("cn").hidden=false;$("sv").textContent="Update event";
+ $("ef").scrollIntoView({behavior:"smooth",block:"center"});
+}
+let imageData="";
+$("imgFile").onchange=e=>{
+ const f=e.target.files&&e.target.files[0];
+ if(!f){imageData="";$("imgPreview").hidden=true;return}
+ const rd=new FileReader();
+ rd.onload=()=>{imageData=rd.result;$("imgPreview").src=imageData;$("imgPreview").hidden=false};
+ rd.readAsDataURL(f);
+};
+function resetForm(){editId=null;imageData="";$("ef").reset();$("imgPreview").hidden=true;$("cp").value=100;$("tm").value="10:00 AM";$("ft").textContent="Create & Publish Event";$("cn").hidden=true;$("sv").textContent="Publish Event"}
+$("cn").onclick=resetForm;
+
+$("ef").onsubmit=async e=>{
+ e.preventDefault();const m=$("em");m.className="msg bad";m.textContent="";
+ const body=JSON.stringify({title:$("t").value,category:$("c").value,event_date:$("d").value,event_time:$("tm").value,venue:$("v").value,capacity:$("cp").value,description:$("ds").value,image_data:imageData});
+ try{
+  await api(editId?"/api/admin/events/"+editId:"/api/admin/events",{method:editId?"PUT":"POST",body});
+  m.className="msg ok";m.textContent=editId?"Event updated.":"Event published.";resetForm();refresh();
+ }catch(err){m.textContent=err.message}
+};
+
+$("uf").onsubmit=async e=>{
+ e.preventDefault();const m=$("um");m.className="msg bad";m.textContent="";
+ try{
+  await api("/api/admin/users",{method:"POST",body:JSON.stringify({name:$("un").value,usn:$("uu").value,email:$("ue").value,department:$("ud").value,role:$("ur").value,password:$("up").value})});
+  m.className="msg ok";m.textContent="User account created.";$("uf").reset();$("ud").value="CSE";refresh();
+ }catch(err){m.textContent=err.message}
+};
+
+async function del(e){
+ if(!confirm(`Delete "${e.title}" and all its registrations?`))return;
+ try{await api("/api/admin/events/"+e.id,{method:"DELETE"});$("regp").hidden=true;refresh()}catch(err){alert(err.message)}
+}
+
+async function viewRegs(e){
+ try{
+  const list=await api("/api/events/"+e.id+"/registrations");
+  $("rt").textContent=`Registrations: ${e.title} (${list.length})`;
+  const b=$("rrows");b.innerHTML="";
+  if(!list.length)b.innerHTML='<tr><td colspan="6">No registrations yet.</td></tr>';
+  list.forEach(r=>{
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td>${esc(r.ticket_id)}</td><td>${esc(r.name)}</td><td>${esc(r.usn||"-")}</td><td>${esc(r.department||"-")}</td><td>${esc(r.email)}</td><td><span class="badge ${r.checked_in?"in":""}">${r.checked_in?"Checked in":"Registered"}</span></td>`;
+   b.appendChild(tr);
+  });
+  $("regp").hidden=false;$("regp").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }catch(err){alert(err.message)}
+}
+
+async function exportCsv(e){
+ try{
+  const csv=await api("/api/events/"+e.id+"/export");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=e.title.replace(/\W+/g,"_")+"_registrations.csv";a.click();URL.revokeObjectURL(a.href);
+ }catch(err){alert(err.message)}
+}
+
+async function checkin(raw){
+ const m=$("cm");m.className="msg bad";
+ const id=raw.startsWith("HYPEUP|")?raw.split("|")[1]:raw.trim().toUpperCase();
+ if(!id){m.textContent="Enter a ticket ID.";return}
+ try{
+  const d=await api("/api/checkin",{method:"POST",body:JSON.stringify({ticket_id:id})});
+  m.className="msg ok";m.textContent=`Checked in: ${d.name} for ${d.title}.`;$("tid").value="";refresh();
+ }catch(err){m.textContent=err.message}
+}
+$("cf").onsubmit=e=>{e.preventDefault();checkin($("tid").value)};
+
+async function startScan(){
+ const m=$("cm");
+ if(typeof jsQR==="undefined"||!navigator.mediaDevices){m.className="msg bad";m.textContent="Camera scanning is not available here. Type the ticket ID instead.";return}
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+  const v=$("cam");v.srcObject=stream;v.hidden=false;await v.play();
+  scanning=true;$("scan").hidden=true;$("stop").hidden=false;m.className="msg";m.textContent="Point the camera at a QR ticket…";tick();
+ }catch(err){m.className="msg bad";m.textContent="Could not open the camera. Allow camera access or type the ticket ID."}
+}
+function stopScan(){
+ scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ $("cam").hidden=true;$("scan").hidden=false;$("stop").hidden=true;
+}
+function tick(){
+ if(!scanning)return;
+ const v=$("cam"),c=$("cv");
+ if(v.readyState===v.HAVE_ENOUGH_DATA){
+  c.width=v.videoWidth;c.height=v.videoHeight;const x=c.getContext("2d");x.drawImage(v,0,0);
+  const img=x.getImageData(0,0,c.width,c.height),code=jsQR(img.data,img.width,img.height);
+  if(code&&code.data){stopScan();checkin(code.data);return}
+ }
+ requestAnimationFrame(tick);
+}
+$("scan").onclick=startScan;$("stop").onclick=stopScan;
+refresh();
+</script>
+</body>
+</html>
