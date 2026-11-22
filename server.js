@@ -9,7 +9,8 @@ const QRCode = require('qrcode');
 const PORT = process.env.PORT || 3002;
 const CATEGORIES = ['Technology', 'Cultural', 'Sports', 'Entertainment', 'Workshop'];
 const ROLES = ['student', 'faculty', 'admin'];
-const DB_PATH = path.join(__dirname, 'hypeup.db');
+const IS_VERCEL = !!process.env.VERCEL;
+const DB_PATH = process.env.DB_PATH || (IS_VERCEL ? '/tmp/hypeup.db' : path.join(__dirname, 'hypeup.db'));
 
 /* ---------- Database: persistent relational storage in hypeup.db ---------- */
 const db = new Database(DB_PATH);
@@ -166,7 +167,7 @@ const newTicketId = () => 'HU-' + crypto.randomBytes(4).toString('hex').slice(0,
 const qrFor = (ticketId, eventId) => QRCode.toDataURL(`HYPEUP|${ticketId}|${eventId}`, { margin: 1, width: 240 });
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 
-const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
+const UPLOADS_DIR = IS_VERCEL ? '/tmp/uploads' : path.join(__dirname, 'public', 'uploads');
 function saveEventImage(imageData, fallbackUrl = '') {
   if (typeof imageData === 'string' && imageData.startsWith('data:image/')) {
     const m = imageData.match(/^data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)$/i);
@@ -245,6 +246,7 @@ function requireRole(...allowedRoles) {
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 /* ---------- Auth APIs (Student, Faculty, Admin) ---------- */
 app.post('/api/auth/register', (req, res) => {
@@ -647,7 +649,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error. Please try again.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`HypeUp running at http://localhost:${PORT}`);
-  console.log('Seeded accounts -> Admin: admin@hypeup.edu / admin123 | Faculty: faculty@hypeup.edu / faculty123 | Student: student@hypeup.edu / student123');
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`HypeUp running at http://localhost:${PORT}`);
+    console.log('Seeded accounts -> Admin: admin@hypeup.edu / admin123 | Faculty: faculty@hypeup.edu / faculty123 | Student: student@hypeup.edu / student123');
+  });
+}
+
+module.exports = app;
