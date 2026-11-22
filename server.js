@@ -105,11 +105,11 @@ function logAction(actor, action, target, details = '') {
 if (db.prepare('SELECT COUNT(*) AS n FROM users').get().n === 0) {
   const adminId = createUser({
     name: 'Campus Admin',
-    email: process.env.ADMIN_EMAIL || 'admin@hypeup.edu',
+    email: process.env.ADMIN_EMAIL || 'ksshowrya33@gmail.com',
     usn: 'ADM001',
     department: 'Administration',
     role: 'admin',
-    password: process.env.ADMIN_PASS || 'admin123'
+    password: process.env.ADMIN_PASS || 'Avengers@2027'
   });
   const facultyId = createUser({
     name: 'Dr. Ananya Rao',
@@ -280,8 +280,8 @@ app.post('/api/auth/login', (req, res) => {
 
   if (!identifier || !password) return res.status(400).json({ error: 'Enter your email and password.' });
 
-  // Support legacy 'admin' username shortcut for admin@hypeup.edu
-  const lookupEmail = identifier === 'admin' ? 'admin@hypeup.edu' : identifier;
+  // Support legacy 'admin' username shortcut
+  const lookupEmail = identifier === 'admin' ? (process.env.ADMIN_EMAIL || 'ksshowrya33@gmail.com') : identifier;
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(lookupEmail);
   const given = user ? Buffer.from(hashPw(password, user.salt), 'hex') : null;
 
@@ -652,7 +652,7 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`HypeUp running at http://localhost:${PORT}`);
-    console.log('Seeded accounts -> Admin: admin@hypeup.edu / admin123 | Faculty: faculty@hypeup.edu / faculty123 | Student: student@hypeup.edu / student123');
+    console.log('Seeded accounts -> Admin: ksshowrya33@gmail.com | Faculty: faculty@hypeup.edu / faculty123 | Student: student@hypeup.edu / student123');
   });
 }
 
