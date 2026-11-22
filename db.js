@@ -19,10 +19,31 @@ function toPgSql(sql) {
 let pool = null;
 let sqlite = null;
 
+function normalizePgUrl(raw) {
+  if (!raw) return raw;
+  const trimmed = raw.trim().replace(/^["']|["']$/g, '');
+  const schemeEnd = trimmed.indexOf('://');
+  const atIdx = trimmed.lastIndexOf('@');
+  if (schemeEnd !== -1 && atIdx > schemeEnd) {
+    const prefix = trimmed.slice(0, schemeEnd + 3);
+    const creds = trimmed.slice(schemeEnd + 3, atIdx);
+    const hostPart = trimmed.slice(atIdx + 1);
+    const colonIdx = creds.indexOf(':');
+    if (colonIdx !== -1) {
+      const user = creds.slice(0, colonIdx);
+      const pass = creds.slice(colonIdx + 1);
+      let safePass = pass;
+      try { safePass = encodeURIComponent(decodeURIComponent(pass)); } catch { safePass = encodeURIComponent(pass); }
+      return `${prefix}${user}:${safePass}@${hostPart}`;
+    }
+  }
+  return trimmed;
+}
+
 if (IS_PG) {
   const { Pool } = require('pg');
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: normalizePgUrl(process.env.DATABASE_URL),
     ssl: { rejectUnauthorized: false },
     max: 5
   });
