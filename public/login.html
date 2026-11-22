@@ -61,7 +61,7 @@
     <div class="msg" id="msg" role="alert"></div>
    </form>
 
-   <div class="demo-box">
+   <div class="demo-box" id="demoBox">
     <b>Demo Credentials (for quick testing):</b><br>
     <span id="demoText">Student: <code>student@hypeup.edu</code> / <code>student123</code></span>
     <div style="margin-top:8px">
@@ -79,7 +79,7 @@ let role="student", isSignup=false;
 const DEMOS={
  student:{email:"student@hypeup.edu",pass:"student123",label:"Student: student@hypeup.edu / student123",dest:"student.html"},
  faculty:{email:"faculty@hypeup.edu",pass:"faculty123",label:"Faculty: faculty@hypeup.edu / faculty123",dest:"faculty.html"},
- admin:{email:"ksshowrya33@gmail.com",pass:"Avengers@2027",label:"Admin: ksshowrya33@gmail.com / Avengers@2027",dest:"admin.html"}
+ admin:{email:"admin@campus.edu",pass:"",label:"",dest:"admin.html"}
 };
 
 // Redirect if already logged in
@@ -102,6 +102,7 @@ function renderUI(){
  $("toggleSignup").textContent=isSignup?"Already have an account? Sign in":"New student? Sign up";
  $("submitBtn").textContent=isSignup?"Create Account & Continue →":`Sign In as ${titleRole} →`;
  $("email").placeholder=DEMOS[role].email;
+ $("demoBox").hidden=role==="admin";
  $("demoText").textContent=DEMOS[role].label;
  $("msg").textContent="";
 }

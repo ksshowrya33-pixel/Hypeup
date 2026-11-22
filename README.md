@@ -9,7 +9,7 @@ Express + SQLite full-stack web application with **3-Role Access Control** (**St
 4. Role-Based Login Portal: http://localhost:3002/login.html
    - **Student**: `student@hypeup.edu` / `student123` (or sign up a new student account)
    - **Faculty**: `faculty@hypeup.edu` / `faculty123`
-   - **Admin**: `ksshowrya33@gmail.com` / `Avengers@2027`
+   - **Admin**: Configured via `ADMIN_EMAIL` / `ADMIN_PASS` (or default admin account)
 
 ## Where is the student & event data saved?
 All data is persisted locally in the relational SQLite database file `hypeup.db` (WAL mode, foreign keys enabled) across 5 normalized tables:
