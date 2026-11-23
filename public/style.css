@@ -197,4 +197,12 @@ footer b{display:block;color:var(--ink);font-size:1.3rem;letter-spacing:.04em}
 .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
 .confetti span{position:absolute;top:-16px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
 @keyframes fall{to{transform:translate(var(--dx),105vh) rotate(720deg)}}
+
+/* Custom GSAP Cursor (fine-pointer devices) */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;opacity:0;transform:translate(-50%,-50%)}
+.cursor-dot{width:8px;height:8px;background:#7091E6;box-shadow:0 0 10px rgba(112,145,230,.55)}
+.cursor-ring{width:34px;height:34px;border:1.75px solid rgba(112,145,230,.8);transition:background-color .2s,border-color .2s}
+.cursor-ring.hover{background:rgba(112,145,230,.14);border-color:#3D52A0}
+.cursor-ripple{position:fixed;top:0;left:0;width:16px;height:16px;border-radius:50%;border:2px solid #7091E6;pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+@media (pointer:coarse),(prefers-reduced-motion:reduce){.cursor-dot,.cursor-ring,.cursor-ripple{display:none!important}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card{transition:none}*,*::before,*::after{animation:none!important}.reveal{opacity:1;transform:none;transition:none}}
