@@ -73,6 +73,8 @@
      <div class="acts" style="margin-top:12px">
       <button class="btn sm ghost" id="scan" type="button">Scan with camera</button>
       <button class="btn sm ghost" id="stop" type="button" hidden>Stop camera</button>
+      <button class="btn sm ghost" id="scanImgBtn" type="button">Scan QR image</button>
+      <input id="qrFile" type="file" accept="image/*" hidden>
      </div>
      <video id="cam" playsinline muted hidden></video><canvas id="cv" hidden></canvas>
      <div class="msg" id="cm" role="status"></div>
@@ -324,30 +326,59 @@ async function checkin(raw){
 }
 $("cf").onsubmit=e=>{e.preventDefault();checkin($("tid").value)};
 
+async function decodeQR(c){
+ const x=c.getContext("2d");
+ if(typeof jsQR!=="undefined"){
+  const img=x.getImageData(0,0,c.width,c.height),code=jsQR(img.data,img.width,img.height);
+  if(code&&code.data)return code.data;
+ }
+ if("BarcodeDetector" in window){
+  try{
+   const det=new BarcodeDetector({formats:["qr_code"]});
+   const res=await det.detect(c);
+   if(res.length&&res[0].rawValue)return res[0].rawValue;
+  }catch(_){}
+ }
+ return null;
+}
+
 async function startScan(){
  const m=$("cm");
- if(typeof jsQR==="undefined"||!navigator.mediaDevices){m.className="msg bad";m.textContent="Camera scanning is not available here. Type the ticket ID instead.";return}
+ if(typeof jsQR==="undefined"&&!("BarcodeDetector" in window)){m.className="msg bad";m.textContent="QR decoder failed to load. Refresh or type the ticket ID.";return}
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){m.className="msg bad";m.textContent="Live camera is unavailable in this browser/tab. Open in Chrome/mobile or use “Scan QR image” / type the ticket ID.";return}
  try{
   stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
   const v=$("cam");v.srcObject=stream;v.hidden=false;await v.play();
   scanning=true;$("scan").hidden=true;$("stop").hidden=false;m.className="msg";m.textContent="Point the camera at a QR ticket…";tick();
- }catch(err){m.className="msg bad";m.textContent="Could not open the camera. Allow camera access or type the ticket ID."}
+ }catch(err){m.className="msg bad";m.textContent="Could not open the camera ("+(err.name||"blocked")+"). Allow camera access or use “Scan QR image”."}
 }
 function stopScan(){
  scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
  $("cam").hidden=true;$("scan").hidden=false;$("stop").hidden=true;
 }
-function tick(){
+async function tick(){
  if(!scanning)return;
  const v=$("cam"),c=$("cv");
  if(v.readyState===v.HAVE_ENOUGH_DATA){
-  c.width=v.videoWidth;c.height=v.videoHeight;const x=c.getContext("2d");x.drawImage(v,0,0);
-  const img=x.getImageData(0,0,c.width,c.height),code=jsQR(img.data,img.width,img.height);
-  if(code&&code.data){stopScan();checkin(code.data);return}
+  c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);
+  const data=await decodeQR(c);
+  if(data){stopScan();checkin(data);return}
  }
  requestAnimationFrame(tick);
 }
 $("scan").onclick=startScan;$("stop").onclick=stopScan;
+$("scanImgBtn").onclick=()=>$("qrFile").click();
+$("qrFile").onchange=e=>{
+ const f=e.target.files&&e.target.files[0];if(!f)return;
+ const m=$("cm");m.className="msg";m.textContent="Scanning QR image…";
+ const img=new Image();
+ img.onload=async()=>{
+  const c=$("cv");c.width=img.width;c.height=img.height;c.getContext("2d").drawImage(img,0,0);
+  const data=await decodeQR(c);URL.revokeObjectURL(img.src);$("qrFile").value="";
+  if(data)checkin(data);else{m.className="msg bad";m.textContent="No QR code found in that image."}
+ };
+ img.src=URL.createObjectURL(f);
+};
 refresh();
 </script>
 </body>
